@@ -16,7 +16,10 @@ public class StarAnimation extends Animation {
 
     /* the field of stars */
     public static final int INIT_STAR_COUNT = 100;
-    private Vector<Star> field = new Vector<Star>();
+
+    public Vector<Star> field = new Vector<Star>();
+
+    private StarChanger starChanger;
 
     /* when this is set to 'false' the next animation frame won't twinkle */
     private boolean twinkle = true;
@@ -24,6 +27,8 @@ public class StarAnimation extends Animation {
     /** ctor expects to be told the size of the animation canvas */
     public StarAnimation(int initWidth, int initHeight) {
         super(initWidth, initHeight);
+        starChanger = new StarChanger(this);
+        starChanger.start();
     }
 
     /** whenever the canvas size changes, generate new stars */
@@ -39,7 +44,7 @@ public class StarAnimation extends Animation {
     }
 
     /** adds a randomly located star to the field */
-    public void addStar() {
+    public synchronized void addStar() {
         //Ignore this call if the canvas hasn't been initialized yet
         if ((width <= 0) || (height <= 0)) return;
 
@@ -51,7 +56,7 @@ public class StarAnimation extends Animation {
     }//addStar
 
     /** removes a random star from the field */
-    public void removeStar() {
+    public synchronized void removeStar() {
         if (field.size() > 100) {
             int index = rand.nextInt(field.size());
             field.remove(index);
@@ -60,7 +65,7 @@ public class StarAnimation extends Animation {
 
     /** draws the next frame of the animation */
     @Override
-    public void draw(Canvas canvas) {
+    public synchronized void draw(Canvas canvas) {
         for (Star s : field) {
             s.draw(canvas);
             if (this.twinkle) {
@@ -74,8 +79,18 @@ public class StarAnimation extends Animation {
     /** the seekbar progress specifies the brightnes of the stars. */
     @Override
     public void progressChange(int newProgress) {
-        int brightness = 255 - (newProgress * 2);
-        Star.starPaint.setColor(Color.rgb(brightness, brightness, brightness));
+       int starNum = field.size();
+        if (starNum < newProgress) {
+            for (int q = 0; q < newProgress - starNum; q++) {
+                addStar();
+            }
+        } else if (starNum > newProgress) {
+            for (int q = 0; q < starNum - newProgress; q++) {
+                removeStar();
+            }
+        }
+
+
         this.twinkle = false;
     }
 }//class StarAnimation

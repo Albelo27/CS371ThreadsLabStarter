@@ -22,7 +22,7 @@ public class AnimationView extends SurfaceView{
     private int height;
 
     //a list of the animations I'm currently displaying
-    private ArrayList<Animation> anims = new ArrayList<Animation>();
+    public ArrayList<Animation> anims = new ArrayList<Animation>();
 
     /** called by the ctors to initialize the variables I've added to this class */
     private void myInitializationStuff() {

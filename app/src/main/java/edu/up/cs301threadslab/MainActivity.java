@@ -19,6 +19,9 @@ public class MainActivity extends Activity
     private AnimationView myAV;
     private Button theButton;
     private SeekBar theSeekBar;
+    private ThreadedAnimationView threadView;
+
+    private boolean running = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +39,16 @@ public class MainActivity extends Activity
         //Let me know when someone adjusts the seekbar
         theSeekBar = (SeekBar)findViewById(R.id.seekBar);
         theSeekBar.setOnSeekBarChangeListener(this);
+        theSeekBar.setMax(1000);
+        theSeekBar.setMin(100);
+
+        threadView = new ThreadedAnimationView(myAV);
+        threadView.start();
     }//onClick
 
     @Override
     public void onClick(View v) {
-        myAV.postInvalidate();
+        running = !running;
     }
 
     @Override
@@ -54,4 +62,4 @@ public class MainActivity extends Activity
     public void onStartTrackingTouch(SeekBar seekBar) {}
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
-}
+}//end of class
